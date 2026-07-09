@@ -1,0 +1,125 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Plus Jakarta Sans", "Inter", system-ui, sans-serif;
+  --font-display: "Outfit", system-ui, sans-serif;
+
+  --color-brand-primary: #8b5cf6;
+  --color-brand-secondary: #a78bfa;
+  --color-brand-accent: #6366f1;
+  --color-brand-neon: #a855f7;
+
+  --color-anime-bg: #090a10;
+  --color-anime-card: #121420;
+  --color-anime-sidebar: #0a0b11;
+  --color-anime-border: #1d2136;
+  --color-anime-text: #eaeaf0;
+  --color-anime-text-muted: #8d93ad;
+}
+
+/* Scrollbar Styles */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: #090a10;
+}
+::-webkit-scrollbar-thumb {
+  background: #1d2136;
+  border-radius: 9999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #8b5cf6;
+}
+
+/* Custom Utilities */
+.glass-panel {
+  background: rgba(18, 20, 32, 0.7);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.glass-nav {
+  background: rgba(10, 11, 17, 0.85);
+  backdrop-filter: blur(20px);
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* Keyframes & Animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes pulse-glow {
+  0%, 100% {
+    opacity: 0.5;
+    box-shadow: 0 0 15px rgba(139, 92, 246, 0.3);
+  }
+  50% {
+    opacity: 1;
+    box-shadow: 0 0 25px rgba(139, 92, 246, 0.6);
+  }
+}
+
+.animate-glow {
+  animation: pulse-glow 2s infinite ease-in-out;
+}
+
+/* Custom Range Input Styling for Video Player */
+input[type="range"].video-slider {
+  -webkit-appearance: none;
+  appearance: none;
+  background: rgba(255, 255, 255, 0.2);
+  cursor: pointer;
+  border-radius: 9999px;
+  height: 4px;
+  transition: height 0.1s ease;
+}
+
+input[type="range"].video-slider:hover {
+  height: 6px;
+}
+
+input[type="range"].video-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  background: #8b5cf6;
+  border-radius: 9999px;
+  height: 12px;
+  width: 12px;
+  box-shadow: 0 0 10px rgba(139, 92, 246, 0.8);
+}
+
+input[type="range"].video-slider::-moz-range-thumb {
+  background: #8b5cf6;
+  border: none;
+  border-radius: 9999px;
+  height: 12px;
+  width: 12px;
+  box-shadow: 0 0 10px rgba(139, 92, 246, 0.8);
+}
+
+/* Plyr Custom Theme Overrides */
+:root {
+  --plyr-color-main: #8b5cf6;
+}
+
