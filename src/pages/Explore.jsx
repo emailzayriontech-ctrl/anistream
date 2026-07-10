@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Search, SlidersHorizontal, EyeOff, Check, ChevronLeft, ChevronRight } from 'lucide-react';
 import AnimeCard from '../components/AnimeCard';
 import LoadingState from '../components/LoadingState';
@@ -13,14 +13,22 @@ const GENRE_LIST = [
 
 const Explore = () => {
   const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const urlQuery = searchParams.get('q') || '';
+
   const [loading, setLoading] = useState(true);
   const [animeList, setAnimeList] = useState([]);
   
   // Search and Filter States
-  const [searchQuery, setSearchQuery] = useState('');
+  const [searchQuery, setSearchQuery] = useState(urlQuery);
   const [selectedGenre, setSelectedGenre] = useState('All');
   const [selectedStatus, setSelectedStatus] = useState('All');
   const [selectedYear, setSelectedYear] = useState('All');
+  
+  // Sync local search input with URL parameter
+  useEffect(() => {
+    setSearchQuery(urlQuery);
+  }, [urlQuery]);
   
   // Pagination State
   const ITEMS_PER_PAGE = 20;
@@ -118,7 +126,10 @@ const Explore = () => {
             <input
               type="text"
               value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
+              onChange={(e) => {
+                setSearchQuery(e.target.value);
+                setSearchParams({ q: e.target.value });
+              }}
               placeholder="Search by title, genre details..."
               className="w-full bg-[#0a0b11] border border-[#1d2136] rounded-xl pl-12 pr-4 py-3 text-xs text-white placeholder-[#535975] transition-all"
             />

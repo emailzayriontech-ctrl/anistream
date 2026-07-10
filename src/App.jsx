@@ -40,7 +40,7 @@ const App = () => {
   }
 
   return (
-    <div className="min-h-screen bg-[#090a10] text-[#eaeaf0] flex flex-col md:flex-row">
+    <div className="min-h-screen bg-[#090a10] text-[#eaeaf0] flex flex-col">
       {/* Sidebar for Desktop / Bottombar for Mobile (Hidden on Splash/Login) */}
       {!isFullScreenView && <BottomNav user={user} />}
 

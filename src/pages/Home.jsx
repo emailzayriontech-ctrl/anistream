@@ -6,6 +6,7 @@ import AnimeCard from '../components/AnimeCard';
 import LoadingState from '../components/LoadingState';
 import { dbService } from '../services/firebase';
 import { getTopAnime, getSeasonNow, getRecentlyUpdatedAnime } from '../services/jikanApi';
+import RightSidebar from '../components/RightSidebar';
 
 const Home = ({ user }) => {
   const navigate = useNavigate();
@@ -162,7 +163,35 @@ const Home = ({ user }) => {
             </section>
           )}
 
-          {/* 4. TRENDING ROW */}
+          {/* 4. ON-GOING ANIME ROW */}
+          {ongoingAnime.length > 0 && (
+            <section className="space-y-4">
+              <div className="flex items-center justify-between">
+                <h2 className="font-display font-extrabold text-lg md:text-xl text-white flex items-center gap-2">
+                  <span className="w-1.5 h-6 bg-[#6366f1] rounded-full" />
+                  On-going Anime
+                </h2>
+                <button 
+                  onClick={() => navigate('/ongoing')} 
+                  className="text-xs text-[#a78bfa] hover:text-[#8b5cf6] font-semibold transition-colors uppercase tracking-wider"
+                >
+                  See All
+                </button>
+              </div>
+              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-3 xl:grid-cols-3 gap-4 sm:gap-5 md:gap-6">
+                {ongoingAnime.slice(0, 6).map((anime, index) => (
+                  <div key={`ongoing-${anime.id}-${index}`} className="relative">
+                    <AnimeCard 
+                      anime={anime} 
+                      onClick={() => navigate(`/anime/${anime.id}`)} 
+                    />
+                  </div>
+                ))}
+              </div>
+            </section>
+          )}
+
+          {/* 5. TRENDING ROW */}
           <section className="space-y-4">
             <div className="flex items-center justify-between">
               <h2 className="font-display font-extrabold text-lg md:text-xl text-white flex items-center gap-2">
@@ -177,7 +206,7 @@ const Home = ({ user }) => {
               </button>
             </div>
             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-3 xl:grid-cols-3 gap-4 sm:gap-5 md:gap-6">
-              {trendingAnime.map((anime, index) => (
+              {trendingAnime.slice(0, 6).map((anime, index) => (
                 <div key={`trending-${anime.id}-${index}`} className="relative">
                   <AnimeCard 
                     anime={anime} 
@@ -189,24 +218,9 @@ const Home = ({ user }) => {
           </section>
         </div>
 
-        {/* RIGHT SIDEBAR (ONGOING) */}
+        {/* RIGHT SIDEBAR */}
         <div className="w-full lg:w-[320px] xl:w-[360px] flex-shrink-0">
-          <div className="bg-[#121420] border border-[#1d2136] rounded-2xl p-5 shadow-lg">
-            <h2 className="font-display font-extrabold text-lg text-white flex items-center gap-2 mb-5">
-              <span className="w-1.5 h-5 bg-[#6366f1] rounded-full" />
-              Ongoing Anime
-            </h2>
-            <div className="grid grid-cols-2 gap-3 sm:gap-4">
-              {ongoingAnime.slice(0, 8).map((anime, index) => (
-                <AnimeCard 
-                  key={`ongoing-${anime.id}-${index}`}
-                  anime={anime} 
-                  variant="vertical"
-                  onClick={() => navigate(`/anime/${anime.id}`)} 
-                />
-              ))}
-            </div>
-          </div>
+          <RightSidebar />
         </div>
 
       </div>
