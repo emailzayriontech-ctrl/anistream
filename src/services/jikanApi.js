@@ -356,7 +356,7 @@ export const getMappedAnimeCatalog = async () => {
   if (mappedCatalogCache) return mappedCatalogCache;
   
   try {
-    const cached = localStorage.getItem('anistream_catalog_v4');
+    const cached = localStorage.getItem('anistream_catalog_v5');
     if (cached) {
       const parsed = JSON.parse(cached);
       if (Date.now() < parsed.expiresAt) {
@@ -396,15 +396,19 @@ export const getMappedAnimeCatalog = async () => {
       idChunks.push(malIds.slice(i, i + 50));
     }
 
-    // Ambil data dari AniList secara paralel untuk mempercepat loading
-    const fetchPromises = idChunks.map(chunk => fetchAniList(query, { idMal_in: chunk }));
-    const results = await Promise.all(fetchPromises);
-    
     let catalog = [];
-    for (const data of results) {
-      if (data && data.Page && data.Page.media) {
-        const mapped = data.Page.media.map(formatAniListAnime).filter(Boolean);
-        catalog = [...catalog, ...mapped];
+    const results = [];
+    for (const chunk of idChunks) {
+      try {
+        const data = await fetchAniList(query, { idMal_in: chunk });
+        if (data && data.Page && data.Page.media) {
+          const mapped = data.Page.media.map(formatAniListAnime).filter(Boolean);
+          catalog = [...catalog, ...mapped];
+        }
+        // Delay singkat untuk menghormati rate limit AniList
+        await new Promise(r => setTimeout(r, 100));
+      } catch (chunkErr) {
+        console.warn("Gagal mengambil chunk dari AniList:", chunkErr.message);
       }
     }
     
@@ -427,13 +431,15 @@ export const getMappedAnimeCatalog = async () => {
       });
     }
 
-    mappedCatalogCache = catalog;
-    try {
-      localStorage.setItem('anistream_catalog_v4', JSON.stringify({
-        data: catalog,
-        expiresAt: Date.now() + 1000 * 60 * 60 * 24 // Cache for 24 hours
-      }));
-    } catch (e) {}
+    if (catalog.length > 0) {
+      mappedCatalogCache = catalog;
+      try {
+        localStorage.setItem('anistream_catalog_v5', JSON.stringify({
+          data: catalog,
+          expiresAt: Date.now() + 1000 * 60 * 60 * 24 // Cache for 24 hours
+        }));
+      } catch (e) {}
+    }
 
     return catalog;
   } catch (error) {
