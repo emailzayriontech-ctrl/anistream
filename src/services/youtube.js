@@ -88,25 +88,12 @@ export const getPlaylistEpisodes = async (playlistId) => {
         };
       });
       
-      const ALLOWED_CHANNELS = [
-        "muse indonesia",
-        "muse asia",
-        "ani-one indonesia",
-        "ani-one asia",
-        "muse id hub tv",
-        "anime on tms official channel",
-        "it's anime",
-        "nozomi entertainment",
-        "nozomi entertaiment" // typo allowance
-      ];
-
-      // Filter out deleted videos AND strictly enforce that the video is uploaded by the playlist owner AND the owner is in the whitelist
+      // Filter out deleted videos AND enforce that the uploader is the playlist owner
       const validItems = processedItems.filter(item => {
         const isNotDeleted = !item.title.toLowerCase().includes('private video') && !item.title.toLowerCase().includes('deleted video');
-        const isOwnerMatch = item.videoOwnerChannelId === item.channelId;
-        const isWhitelisted = ALLOWED_CHANNELS.includes(item.channelTitle.toLowerCase().trim());
+        const isOwnerMatch = !item.videoOwnerChannelId || item.videoOwnerChannelId === item.channelId;
         
-        return isNotDeleted && isOwnerMatch && isWhitelisted;
+        return isNotDeleted && isOwnerMatch;
       });
       
       allItems = [...allItems, ...validItems];
