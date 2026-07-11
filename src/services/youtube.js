@@ -1,6 +1,6 @@
 import animePlaylistMap from '../data/animePlaylistMap.json';
 
-const CACHE_PREFIX = 'yt_playlist_v3_';
+const CACHE_PREFIX = 'yt_playlist_v4_';
 const CACHE_TTL_MS = 60 * 60 * 1000; // 1 hour in milliseconds
 
 /**
