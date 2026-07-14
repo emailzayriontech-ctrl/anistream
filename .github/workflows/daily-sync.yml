@@ -1,6 +1,9 @@
-name: Daily YouTube Playlist Sync
+name: Daily YouTube Playlist Sync & FTP Deploy
 
 on:
+  push:
+    branches:
+      - main
   schedule:
     # Runs at 17:00 UTC (00:00 midnight WIB / GMT+7) every day
     - cron: '0 17 * * *'
@@ -10,7 +13,7 @@ permissions:
   contents: write # Required to push commits to the repo
 
 jobs:
-  sync:
+  sync-and-deploy:
     runs-on: ubuntu-latest
 
     steps:
@@ -20,18 +23,32 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-node: '20'
+          node-version: '20'
           cache: 'npm'
 
       - name: Install Dependencies
         run: npm ci
 
       - name: Run Playlist Sync Script
+        if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
         env:
           VITE_YOUTUBE_API_KEY: ${{ secrets.VITE_YOUTUBE_API_KEY }}
         run: npm run sync-playlists
 
+      - name: Build Site
+        run: npm run build
+
+      - name: Deploy to Hostdata.id (FTP)
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+        with:
+          server: ${{ secrets.FTP_SERVER }}
+          username: ${{ secrets.FTP_USERNAME }}
+          password: ${{ secrets.FTP_PASSWORD }}
+          server-dir: ${{ secrets.FTP_SERVER_DIR || 'public_html/' }}
+          local-dir: './dist/'
+
       - name: Commit and Push Mappings
+        if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
         run: |
           git config --global user.name 'github-actions[bot]'
           git config --global user.email 'github-actions[bot]@users.noreply.github.com'
