@@ -1,4 +1,4 @@
-name: Daily YouTube Playlist Sync & FTP Deploy
+name: Daily YouTube Playlist Sync & GitHub Pages Deploy
 
 on:
   push:
@@ -10,11 +10,20 @@ on:
   workflow_dispatch: # Allows manual trigger from GitHub UI
 
 permissions:
-  contents: write # Required to push commits to the repo
+  contents: write  # Required to push commits to the repo
+  pages: write     # Required to deploy to GitHub Pages
+  id-token: write  # Required for OIDC token (GitHub Pages deploy)
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
 
 jobs:
   sync-and-deploy:
     runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
 
     steps:
       - name: Checkout Repository
@@ -40,18 +49,17 @@ jobs:
       - name: Build Site
         run: npm run build
 
-      - name: Deploy to Hostdata.id (FTP)
-        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+      - name: Setup Pages
+        uses: actions/configure-pages@v5
+
+      - name: Upload artifact to GitHub Pages
+        uses: actions/upload-pages-artifact@v3
         with:
-          server: ${{ secrets.FTP_SERVER }}
-          username: ${{ secrets.FTP_USERNAME }}
-          password: ${{ secrets.FTP_PASSWORD }}
-          server-dir: ${{ secrets.FTP_SERVER_DIR || 'public_html/' }}
-          local-dir: './dist/'
-          security: loose
-          timeout: 120000
-          protocol: ftp
-          port: 21
+          path: './dist'
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
 
       - name: Commit and Push Mappings
         if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
@@ -59,4 +67,3 @@ jobs:
         with:
           commit_message: "chore: auto-sync YouTube playlists [skip ci]"
           file_pattern: "src/data/animePlaylistMap.json failed-playlists.json"
-
